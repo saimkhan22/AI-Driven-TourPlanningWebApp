@@ -33,6 +33,8 @@ import AITravelBot from '@/components/chat/AITravelBot';
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isExploreOpen, setIsExploreOpen] = useState(false);
+
 
   const features = [
     {
@@ -153,22 +155,91 @@ export default function Home() {
               </div>
               
               <div className="hidden md:flex items-center space-x-8">
-                <Link href="/" className="text-white hover:text-orange-400 transition-colors font-medium text-lg">
-                  Home
-                </Link>
-                <Link href="/destinations" className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg">
-                  Destinations
-                </Link>
-                <Link href="/hotels" className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg">
-                  Hotels
-                </Link>
-                <Link href="/vehicles" className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg">
-                  Vehicles
-                </Link>
-                <Link href="/traffic" className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg">
-                  Traffic
-                </Link>
-                <UserMenu />
+                <div className="hidden md:flex items-center space-x-8">
+
+  <div className="hidden md:flex items-center space-x-8">
+  {/* Main links */}
+  <Link
+    href="/"
+    className="text-white hover:text-orange-400 transition-colors font-medium text-lg"
+  >
+    Home
+  </Link>
+
+  <Link
+    href="/destinations"
+    className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg"
+  >
+    Destinations
+  </Link>
+
+  <Link
+    href="/hotels"
+    className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg"
+  >
+    Hotels
+  </Link>
+
+  <Link
+    href="/vehicles"
+    className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg"
+  >
+    Vehicles
+  </Link>
+
+  <Link
+    href="/traffic"
+    className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg"
+  >
+    Traffic
+  </Link>
+
+  {/* ✅ Explore dropdown (Option A) */}
+  <div
+  className="relative"
+  onMouseEnter={() => setIsExploreOpen(true)}
+  onMouseLeave={() => setIsExploreOpen(false)}
+>
+  <button
+    type="button"
+    onClick={() => setIsExploreOpen((prev) => !prev)}
+    className="text-white/80 hover:text-orange-400 transition-colors font-medium text-lg flex items-center gap-1"
+  >
+    Explore
+    <ChevronDown className="w-4 h-4" />
+  </button>
+
+  {/* FIXED DROPDOWN */}
+  {isExploreOpen && (
+    <div
+      className="
+        absolute left-0 top-full     /* attaches EXACTLY under Explore button */
+        w-56 bg-white shadow-lg rounded-xl
+        py-2 z-50
+      "
+    >
+      <Link href="/scenic-routes" className="block px-4 py-2 text-sm hover:bg-gray-100">Scenic Routes</Link>
+      <Link href="/weather-alerts" className="block px-4 py-2 text-sm hover:bg-gray-100">Weather Alerts</Link>
+      <Link href="/budget-optimizer" className="block px-4 py-2 text-sm hover:bg-gray-100">Budget Optimizer</Link>
+      <Link href="/emergency-hotspots" className="block px-4 py-2 text-sm hover:bg-gray-100">Emergency Hotspots</Link>
+      <Link href="/buses" className="block px-4 py-2 text-sm hover:bg-gray-100">Buses</Link>
+      <Link href="/foods" className="block px-4 py-2 text-sm hover:bg-gray-100">Foods</Link>
+      <Link href="/travel-diary" className="block px-4 py-2 text-sm hover:bg-gray-100">Travel Diary</Link>
+    </div>
+  )}
+</div>
+
+
+
+
+
+  {/* User menu stays at the end */}
+  <UserMenu />
+</div>
+
+
+</div>
+
               </div>
 
               <div className="md:hidden">

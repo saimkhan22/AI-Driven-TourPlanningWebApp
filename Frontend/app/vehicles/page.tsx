@@ -33,7 +33,7 @@ export default function VehiclesPage() {
       name: 'Suzuki Alto',
       type: '4-Seater Car',
       category: 'Economy Cars',
-      image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://static.pakwheels.com/2025/04/IMG-20250417-WA0065-1.jpg',
       price: 2500,
       passengers: 4,
       luggage: 2,
@@ -58,7 +58,7 @@ export default function VehiclesPage() {
       name: 'Suzuki Cultus',
       type: '4-Seater Car',
       category: 'Economy Cars',
-      image: 'https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIifekuxVkAGjgKv-sjrkkBC7sQEF1jJWKKg&s',
       price: 2800,
       passengers: 4,
       luggage: 2,
@@ -83,7 +83,7 @@ export default function VehiclesPage() {
       name: 'Toyota Corolla',
       type: '4-Seater Car',
       category: 'Standard Cars',
-      image: 'https://images.pexels.com/photos/1719648/pexels-photo-1719648.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDG-FjgBNEB7X8yRg8xw5OiWgL07NMdc98fQ&s',
       price: 3500,
       passengers: 4,
       luggage: 3,
@@ -108,7 +108,7 @@ export default function VehiclesPage() {
       name: 'Honda Civic',
       type: '4-Seater Car',
       category: 'Premium Cars',
-      image: 'https://images.pexels.com/photos/2920064/pexels-photo-2920064.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTb8U99hayd0hZuZ6ZxipWF3MQhqjQxNtMwXQ&s',
       price: 4500,
       passengers: 4,
       luggage: 3,
@@ -133,7 +133,7 @@ export default function VehiclesPage() {
       name: 'Suzuki Wagon R',
       type: '4-Seater Car',
       category: 'Compact Cars',
-      image: 'https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXVC9hHLkj-XzOVXkPPALDVHfYq9cFf_UJwA&s',
       price: 3000,
       passengers: 4,
       luggage: 2,
@@ -154,13 +154,13 @@ export default function VehiclesPage() {
       roadSuitability: ['City Roads', 'Paved Roads']
     },
 
-    // SUVs (7-Seater)
+   
     {
       id: 6,
       name: 'Toyota Fortuner',
       type: '7-Seater SUV',
       category: 'Premium SUVs',
-      image: 'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6IJy4I-jKTFTpo-fHbVvONjIuMNMw37JlZQ&s',
       price: 9500,
       passengers: 7,
       luggage: 5,
@@ -185,7 +185,7 @@ export default function VehiclesPage() {
       name: 'Toyota Prado',
       type: '7-Seater SUV',
       category: 'Luxury SUVs',
-      image: 'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://nextgen-images.cdn.dealersolutions.com.au/modular.multisite.dealer.solutions/wp-content/uploads/sites/1576/2020/03/06092755/Prado_Horizon_Special-3-1200x675.jpg?format=webp&width=1200',
       price: 12000,
       passengers: 7,
       luggage: 5,
@@ -210,7 +210,7 @@ export default function VehiclesPage() {
       name: 'Honda BR-V',
       type: '7-Seater SUV',
       category: 'Family SUVs',
-      image: 'https://images.pexels.com/photos/2920064/pexels-photo-2920064.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2022_Honda_BR-V_Prestige_with_Honda_Sensing_1.5_DG3_%2820220429%29.jpg/1200px-2022_Honda_BR-V_Prestige_with_Honda_Sensing_1.5_DG3_%2820220429%29.jpg',
       price: 6500,
       passengers: 7,
       luggage: 4,
@@ -235,7 +235,7 @@ export default function VehiclesPage() {
       name: 'Suzuki Vitara',
       type: '5-Seater SUV',
       category: 'Compact SUVs',
-      image: 'https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXEFke7ykUxV1SnQ_RD2E5jnEFFzRSknAbiw&s',
       price: 5500,
       passengers: 5,
       luggage: 3,
@@ -256,13 +256,13 @@ export default function VehiclesPage() {
       roadSuitability: ['City Roads', 'Highways']
     },
 
-    // Vans
+    
     {
       id: 10,
       name: 'Suzuki APV',
       type: '8-Seater Van',
       category: 'Family Vans',
-      image: 'https://images.pexels.com/photos/1319839/pexels-photo-1319839.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/2014_Suzuki_APV_Arena_SGX_1.5_DN42V_%2820190623%29.jpg/330px-2014_Suzuki_APV_Arena_SGX_1.5_DN42V_%2820190623%29.jpg',
       price: 6000,
       passengers: 8,
       luggage: 6,
@@ -287,7 +287,7 @@ export default function VehiclesPage() {
       name: 'Toyota Hiace',
       type: '15-Seater Van',
       category: 'Group Transport',
-      image: 'https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTibl09eCFjRqwDThuQwg259N6n9oMoa57PA&s',
       price: 12000,
       passengers: 15,
       luggage: 10,
@@ -312,7 +312,7 @@ export default function VehiclesPage() {
       name: 'Suzuki Bolan',
       type: '8-Seater Van',
       category: 'Budget Vans',
-      image: 'https://images.pexels.com/photos/1319839/pexels-photo-1319839.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTe190eAKq4cdRlmbf45nfJgxnDPaLs_PMkA&s',
       price: 4500,
       passengers: 8,
       luggage: 4,
@@ -333,13 +333,13 @@ export default function VehiclesPage() {
       roadSuitability: ['City Roads', 'Paved Roads']
     },
 
-    // Buses/Coasters
+   
     {
       id: 13,
       name: 'Pakistani Coaster (25-Seater)',
       type: '25-Seater Bus',
       category: 'Tour Buses',
-      image: 'https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://i.ytimg.com/vi/h0TJ2wuRg5U/maxresdefault.jpg',
       price: 18000,
       passengers: 25,
       luggage: 15,
@@ -364,7 +364,7 @@ export default function VehiclesPage() {
       name: 'Large Pakistani Coaster (30-Seater)',
       type: '30-Seater Bus',
       category: 'Tour Buses',
-      image: 'https://images.pexels.com/photos/1007410/pexels-photo-1007410.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp1Qmy_0NqNiDS6-6DgIaWcXwDxXhU6Ik0Aw&s',
       price: 22000,
       passengers: 30,
       luggage: 20,
@@ -385,13 +385,12 @@ export default function VehiclesPage() {
       roadSuitability: ['Highways', 'Motorways']
     },
 
-    // Motorcycles
     {
       id: 15,
       name: 'Honda CD 125',
       type: 'Motorcycle',
       category: 'Standard Bikes',
-      image: 'https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://propakistani.pk/wp-content/uploads/2021/10/CG-125-e1634030390368.jpg',
       price: 1500,
       passengers: 2,
       luggage: 1,
@@ -416,7 +415,7 @@ export default function VehiclesPage() {
       name: 'Yamaha YBR 125',
       type: 'Motorcycle',
       category: 'Sport Bikes',
-      image: 'https://images.pexels.com/photos/2116475/pexels-photo-2116475.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      image: 'https://www.yamaha-motor.com.pk/wp-content/uploads/2024/09/YELLOW-125G-INSIDE-PRODUCT.png',
       price: 1800,
       passengers: 2,
       luggage: 1,
