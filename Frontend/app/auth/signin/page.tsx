@@ -1,28 +1,70 @@
-'use client';
+"use client";
 
-import LoginForm from '@/components/auth/LoginForm';
-import { Plane } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
 
 export default function SignInPage() {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center space-x-3">
-            <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
-              <Plane className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <span className="text-2xl font-bold text-gray-900">SMM Travel</span>
-              <p className="text-sm text-gray-600">Explore Pakistan</p>
-            </div>
-          </Link>
-        </div>
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-        <LoginForm />
-      </div>
+  const handleLogin = async () => {
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Login Successful");
+        // redirect if needed
+        // router.push("/dashboard");
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (error) {
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: "400px", margin: "50px auto" }}>
+      <h2>Sign In</h2>
+
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+      />
+
+      <button
+        onClick={handleLogin}
+        disabled={loading}
+        style={{ width: "100%", padding: "10px" }}
+      >
+        {loading ? "Logging in..." : "Login"}
+      </button>
     </div>
   );
 }

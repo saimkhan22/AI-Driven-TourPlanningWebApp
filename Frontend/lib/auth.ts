@@ -1,37 +1,8 @@
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-
-// Mock user database - replace with your actual database
-const users = [
-  {
-    id: '1',
-    name: 'Ahmed Hassan',
-    email: 'ahmed@example.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9qK', // password123
-    role: 'customer',
-    phone: '+92-300-1234567',
-    image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-  },
-  {
-    id: '2',
-    name: 'Sarah Khan',
-    email: 'sarah@example.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9qK', // password123
-    role: 'hotel_owner',
-    phone: '+92-300-2345678',
-    image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-  },
-  {
-    id: '3',
-    name: 'Admin User',
-    email: 'admin@smmtravel.com',
-    password: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/VcSAg/9qK', // password123
-    role: 'admin',
-    phone: '+92-300-0000000',
-    image: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-  }
-];
+import dbConnect from './mongod';
+import User from '@/models/User';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -43,23 +14,25 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null;
+          throw new Error('Please enter an email and password');
         }
 
-        const user = users.find(u => u.email === credentials.email);
-        
+        await dbConnect();
+
+        const user = await User.findOne({ email: credentials.email });
+
         if (!user) {
-          return null;
+          throw new Error('No user found with this email');
         }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-        
+
         if (!isPasswordValid) {
-          return null;
+          throw new Error('Invalid password');
         }
 
         return {
-          id: user.id,
+          id: user._id.toString(),
           email: user.email,
           name: user.name,
           role: user.role,
@@ -92,5 +65,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/signin',
     signUp: '/auth/signup'
-  }
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
