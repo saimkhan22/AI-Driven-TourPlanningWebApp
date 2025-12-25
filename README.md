@@ -1,5 +1,5 @@
-AI-Driven Tour Planning Web Application
-1. Project Description
+**AI-Driven Tour Planning Web Application**
+**1. Project Description**
 
 The AI-Driven Tour Planning Web Application is a modern web-based platform designed to help users plan and manage travel across Pakistan efficiently.
 
@@ -17,7 +17,7 @@ This ensures a safe, smooth, and personalized travel experience.
 
 The application is developed using Next.js for both frontend and backend, while MongoDB is used for data storage.
 
-2. Problem Statement
+**2. Problem Statement**
 
 Tour planning in Pakistan is often:
 
@@ -39,7 +39,7 @@ Managing bookings in one place
 
 This project solves these issues by offering an AI-powered, centralized travel planning solution.
 
-3. Project Objectives
+**3. Project Objectives**
 
 The main objectives of this project are:
 
@@ -53,7 +53,7 @@ Ensure traveler safety through an Emergency SOS feature
 
 Develop a scalable and user-friendly web application
 
-4. System Architecture
+**4. System Architecture**
 
 The application follows a client–server architecture:
 
@@ -65,8 +65,8 @@ Database: MongoDB (via Mongoose ODM)
 
 Authentication: JWT-based secure login system
 
-5. Technology Stack
-Frontend
+**5. Technology Stack
+Frontend**
 
 Next.js 13 (App Router)
 
@@ -100,8 +100,8 @@ Postman (API Testing)
 
 Vercel (Deployment)
 
-6. Project Folder Structure
-project-root/
+**6. Project Folder Structure
+project-root/**
 │
 ├── app/
 │   ├── api/
@@ -130,8 +130,8 @@ project-root/
 ├── package.json
 └── README.md
 
-7. Core Functionalities
-User Authentication
+**7. Core Functionalities
+User Authentication**
 
 Secure signup and login
 
@@ -175,7 +175,7 @@ Access to emergency services
 
 Location-based assistance
 
-8. Frontend–Backend Integration Flow
+**8. Frontend–Backend Integration Flow**
 
 User interacts with frontend (page.tsx)
 
@@ -187,7 +187,7 @@ Backend communicates with MongoDB
 
 Response is returned to frontend UI
 
-9. Database Design
+**9. Database Design**
 
 MongoDB collections include:
 
@@ -207,7 +207,7 @@ Reviews and Ratings
 
 Each collection is designed for scalability and fast access.
 
-10. Security Implementation
+**10. Security Implementation**
 
 Password hashing using bcrypt
 
@@ -219,7 +219,7 @@ Protected API routes
 
 HTTPS support in production
 
-11. Testing Strategy
+**11. Testing Strategy**
 
 API testing using Postman
 
@@ -229,7 +229,7 @@ Boundary Value Testing
 
 Selenium for automated UI testing (optional)
 
-12. Scalability & Performance
+**12. Scalability & Performance**
 
 Modular backend structure
 
@@ -239,7 +239,7 @@ MongoDB flexible schema design
 
 Optimized APIs for fast response
 
-13. Environment Setup
+**13. Environment Setup**
 Install Dependencies
 npm install
 
@@ -250,7 +250,7 @@ JWT_SECRET=your_secret_key
 Run Application
 npm run dev
 
-14. Team Members
+**14. Team Members**
 
 Saim Ali Khan
 
@@ -258,7 +258,7 @@ Moheed Khan
 
 Muzamil Khan
 
-15. Future Enhancements
+**15. Future Enhancements**
 
 Online payment integration
 
@@ -268,7 +268,7 @@ Advanced AI chatbot
 
 Mobile application support
 
-16. Feature Details Summary
+**16. Feature Details Summary**
 
 Authentication
 
@@ -296,7 +296,7 @@ Vehicles
 
 Weather Alerts
 
-17. Conclusion
+**17. Conclusion**
 
 The AI-Driven Tour Planning Web Application provides a complete, smart, and secure solution for travelers.
 It simplifies travel planning, improves safety, and enhances user experience through AI-based features and modern web technologies.
