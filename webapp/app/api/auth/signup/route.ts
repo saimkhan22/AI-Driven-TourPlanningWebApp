@@ -1,47 +1,39 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
-  try {
-    await dbConnect();
+  console.log("➡️ Signup API called");
 
-    const { name, email, password } = await req.json();
+  await dbConnect();
+  console.log("✅ DB connected");
 
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
-    }
+  const body = await req.json();
+  console.log("📦 Body received:", body);
 
-    const existingUser = await User.findOne({ email });
+  const { name, email, password } = body;
 
-    if (existingUser) {
-      return NextResponse.json(
-        { message: "User already exists" },
-        { status: 409 }
-      );
-    }
+  const existingUser = await User.findOne({ email });
+  console.log("🔍 User check done");
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await User.create({
-      name,
-      email,
-      password: hashedPassword
-    });
-
+  if (existingUser) {
     return NextResponse.json(
-      { message: "Signup successful" },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "Something went wrong" },
-      { status: 500 }
+      { message: "User already exists" },
+      { status: 400 }
     );
   }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  console.log("🔐 Password hashed");
+
+  await User.create({ name, email, password: hashedPassword });
+  console.log("✅ User created");
+
+  return NextResponse.json(
+    { message: "Signup successful" },
+    { status: 201 }
+  );
 }
