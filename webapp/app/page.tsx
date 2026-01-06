@@ -263,21 +263,30 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button 
-                size="lg" 
-                className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4 rounded-full text-lg font-medium"
-              >
-                Plan Your Trip
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-medium bg-transparent"
-              >
-                Explore Destinations
-              </Button>
-            </div>
+
+  {/* Plan Your Trip → Signup */}
+  <Link href="/signup" className="inline-block">
+    <Button
+      size="lg"
+      className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4 rounded-full text-lg font-medium"
+    >
+      Plan Your Trip
+      <ArrowRight className="w-5 h-5 ml-2" />
+    </Button>
+  </Link>
+
+  {/* Explore Destinations → Destinations */}
+  <Link href="/destinations" className="inline-block">
+    <Button
+      size="lg"
+      variant="outline"
+      className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-medium bg-transparent"
+    >
+      Explore Destinations
+    </Button>
+  </Link>
+
+</div>
 
             {/* Scroll Indicator */}
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
@@ -454,7 +463,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
+      
       <footer className="bg-gray-900 text-white py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
