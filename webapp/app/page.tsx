@@ -265,15 +265,13 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
 
   {/* Plan Your Trip → Signup */}
-  <Link href="/signup" className="inline-block">
-    <Button
-      size="lg"
-      className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4 rounded-full text-lg font-medium"
-    >
-      Plan Your Trip
-      <ArrowRight className="w-5 h-5 ml-2" />
-    </Button>
-  </Link>
+ <Link href="/signin">
+  <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
+    Plan Your Trip
+    <ArrowRight className="w-5 h-5 ml-2" />
+  </Button>
+</Link>
+
 
   {/* Explore Destinations → Destinations */}
   <Link href="/destinations" className="inline-block">

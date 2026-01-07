@@ -1,5 +1,9 @@
 'use client';
 
+
+const isLoggedIn =
+  typeof window !== 'undefined' && localStorage.getItem('token');
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -190,10 +194,12 @@ export default function DestinationsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center text-emerald-600 hover:text-emerald-700">
-                <ArrowLeft className="w-5 h-5 mr-2" />
-                Back to Home
-              </Link>
+              <Link
+  href={isLoggedIn ? '/dashboard' : '/'}
+  className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500"
+>
+  ← Back to {isLoggedIn ? 'Dashboard' : 'Home'}
+</Link>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="outline" size="sm">
