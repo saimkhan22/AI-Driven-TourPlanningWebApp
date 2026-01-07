@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import connectDB from '@/lib/mongodb';
 import User from '@/models/User';
 
@@ -10,17 +9,14 @@ export async function POST(req: Request) {
 
     const { email, password } = await req.json();
 
-    // 1️⃣ Validate input
     if (!email || !password) {
       return NextResponse.json(
-        { message: 'Email and password are required' },
+        { message: 'Email and password required' },
         { status: 400 }
       );
     }
 
-    // 2️⃣ Find user
-   const user = await User.findOne({ email } as any);
-
+    const user = await User.findOne({ email: email });
     if (!user) {
       return NextResponse.json(
         { message: 'Invalid email or password' },
@@ -28,9 +24,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3️⃣ Compare password
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
       return NextResponse.json(
         { message: 'Invalid email or password' },
@@ -38,25 +32,19 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4️⃣ Create token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
-    );
-
-    // 5️⃣ Success
-    return NextResponse.json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        email: user.email,
+    return NextResponse.json(
+      {
+        message: 'Login successful',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+        },
       },
-    });
-
+      { status: 200 }
+    );
   } catch (error) {
-    console.error('Login error:', error);
+    console.error(error);
     return NextResponse.json(
       { message: 'Server error' },
       { status: 500 }

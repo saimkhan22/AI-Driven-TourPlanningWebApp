@@ -11,12 +11,17 @@ import {
 } from '@/components/ui/card';
 import {
   MapPin,
-  Hotel,
-  Car,
   Navigation,
   ArrowRight,
   Plane,
   MessageCircle,
+  Mountain,
+  Utensils,
+  Bus,
+  CloudRain,
+  Wallet,
+  ShieldAlert,
+  BookOpen,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -31,7 +36,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="font-medium text-gray-700 hover:text-orange-500">
+            <Link href="/dashboard" className="font-medium text-orange-500">
               Dashboard
             </Link>
             <Link href="/destinations" className="font-medium text-gray-700 hover:text-orange-500">
@@ -117,28 +122,46 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <ServiceCard
-              icon={<Hotel />}
-              title="Hotels"
-              desc="Find hotels & guesthouses"
-              href="/hotels"
+              icon={<Mountain />}
+              title="Scenic Routes"
+              desc="Beautiful & safe travel paths"
+              href="/scenic-routes"
             />
             <ServiceCard
-              icon={<Car />}
-              title="Vehicles"
-              desc="Book cars & jeeps"
-              href="/vehicles"
+              icon={<Utensils />}
+              title="Foods"
+              desc="Local cuisines & famous spots"
+              href="/foods"
             />
             <ServiceCard
-              icon={<Navigation />}
-              title="Traffic & Routes"
-              desc="Live route updates"
-              href="/traffic"
+              icon={<Bus />}
+              title="Buses"
+              desc="Public transport & routes"
+              href="/buses"
             />
             <ServiceCard
-              icon={<MapPin />}
-              title="Saved Trips"
-              desc="Your planned journeys"
-              href="/saved-trips"
+              icon={<CloudRain />}
+              title="Weather Alerts"
+              desc="Live weather warnings"
+              href="/weather-alerts"
+            />
+            <ServiceCard
+              icon={<Wallet />}
+              title="Budget Optimizer"
+              desc="Plan trips within budget"
+              href="/budget-optimizer"
+            />
+            <ServiceCard
+              icon={<ShieldAlert />}
+              title="Emergency Hotspots"
+              desc="Hospitals & help points"
+              href="/emergency-hotspots"
+            />
+            <ServiceCard
+              icon={<BookOpen />}
+              title="Travel Diary"
+              desc="Save memories & notes"
+              href="/travel-diary"
             />
           </div>
         </section>

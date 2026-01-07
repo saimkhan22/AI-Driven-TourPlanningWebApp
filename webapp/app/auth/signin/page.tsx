@@ -24,14 +24,14 @@ export default function SignIn() {
 
       const data = await res.json();
 
-      // ❌ WRONG EMAIL OR PASSWORD
+      
       if (!res.ok) {
         setError(data.message || 'Login failed');
         setLoading(false);
         return;
       }
 
-      // ✅ SUCCESS
+  
       localStorage.setItem('token', data.token);
       router.push('/dashboard');
 
