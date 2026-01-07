@@ -3,6 +3,7 @@
 
 const isLoggedIn =
   typeof window !== 'undefined' && localStorage.getItem('token');
+  
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';

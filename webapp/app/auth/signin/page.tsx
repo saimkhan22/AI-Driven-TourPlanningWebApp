@@ -2,59 +2,77 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginUser } from '@/lib/auth';
 
-export default function SignInPage() {
+export default function SignIn() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
 
-    // ✅ Simulate backend success
-    setTimeout(() => {
-      loginUser({ email });
-      router.push('/dashboard'); // 🔥 IMPORTANT
-    }, 800);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      // ❌ WRONG EMAIL OR PASSWORD
+      if (!res.ok) {
+        setError(data.message || 'Login failed');
+        setLoading(false);
+        return;
+      }
+
+      // ✅ SUCCESS
+      localStorage.setItem('token', data.token);
+      router.push('/dashboard');
+
+    } catch (err) {
+      setError('Backend server not reachable');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
+    <form onSubmit={handleLogin} className="max-w-md mx-auto mt-20 space-y-4">
+      <h1 className="text-2xl font-bold">Sign In</h1>
+
+      {error && <p className="text-red-500">{error}</p>}
+
+      <input
+        type="email"
+        placeholder="Email"
+        className="w-full border p-2"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+
+      <input
+        type="password"
+        placeholder="Password"
+        className="w-full border p-2"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+      />
+
+      <button
+        type="submit"
+        className="w-full bg-orange-500 text-white py-2"
+        disabled={loading}
       >
-        <h1 className="text-2xl font-bold mb-6 text-center">Sign In</h1>
-
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full border p-3 rounded mb-4"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full border p-3 rounded mb-6"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-orange-500 text-white py-3 rounded hover:bg-orange-600"
-        >
-          {loading ? 'Signing in...' : 'Sign In'}
-        </button>
-      </form>
-    </div>
+        {loading ? 'Signing in...' : 'Sign In'}
+      </button>
+    </form>
   );
 }
