@@ -1,7 +1,8 @@
 export const isLoggedIn = () => {
   if (typeof window === 'undefined') return false;
-  return !!localStorage.getItem('user');
+  return !!localStorage.getItem('token');
 };
+
 
 export const loginUser = (user: any) => {
   localStorage.setItem('user', JSON.stringify(user));

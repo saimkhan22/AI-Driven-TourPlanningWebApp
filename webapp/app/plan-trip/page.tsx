@@ -2,137 +2,155 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import {
-  Calendar,
   MapPin,
+  Calendar,
   Users,
-  Wallet,
-  ArrowRight,
-  Plane,
   Car,
+  Wallet,
+  ArrowLeft,
+  CheckCircle,
 } from 'lucide-react';
 
-export default function PlanTripPage() {
+/* ================= AUTH CHECK ================= */
+const isLoggedIn = () =>
+  typeof window !== 'undefined' && !!localStorage.getItem('token');
+
+type TripPlan = {
+  destination: string;
+  travelers: string;
+  vehicle: string;
+  startDate: string;
+  endDate: string;
+};
+
+export default function PlanResultPage() {
   const router = useRouter();
+  const [trip, setTrip] = useState<TripPlan | null>(null);
 
-  // 🔐 AUTH CHECK
+  /* ================= PROTECT PAGE ================= */
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/signin');
-    }
-  }, [router]);
-
-  const [from, setFrom] = useState('');
-  const [destination, setDestination] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [travelers, setTravelers] = useState('');
-  const [budget, setBudget] = useState('');
-  const [vehicle, setVehicle] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handlePlanTrip = () => {
-    // ❌ VALIDATION (professional rule)
-    if (
-      !from ||
-      !destination ||
-      !startDate ||
-      !endDate ||
-      !travelers ||
-      !budget ||
-      !vehicle
-    ) {
-      alert('❌ Please fill all required fields');
+    if (!isLoggedIn()) {
+      router.replace('/login');
       return;
     }
 
-    setLoading(true);
+    const storedTrip = localStorage.getItem('tripPlan');
+    if (!storedTrip) {
+      router.replace('/plan-trip');
+      return;
+    }
 
-    // Save trip temporarily (later DB)
-    localStorage.setItem(
-      'tripData',
-      JSON.stringify({
-        from,
-        destination,
-        startDate,
-        endDate,
-        travelers,
-        budget,
-        vehicle,
-      })
-    );
+    setTrip(JSON.parse(storedTrip));
+  }, [router]);
 
-    setTimeout(() => {
-      router.push('/trip-result');
-    }, 1000);
-  };
+  if (!trip) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* NAVBAR */}
-      <nav className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Plane className="text-orange-500" />
-            <span className="font-bold text-xl">SMM Travel</span>
-          </div>
+    <div className="min-h-screen bg-gray-50 p-6 flex justify-center">
+      <div className="w-full max-w-4xl space-y-6">
+        
+        {/* HEADER */}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" onClick={() => router.push('/plan-trip')}>
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+          <h1 className="text-2xl font-bold">Your Trip Plan ✨</h1>
         </div>
-      </nav>
 
-      {/* CONTENT */}
-      <main className="max-w-3xl mx-auto px-6 py-10">
-        <Card>
+        {/* SUMMARY CARD */}
+        <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Plan Your Trip ✈️</CardTitle>
+            <CardTitle className="text-xl">Trip Summary</CardTitle>
             <CardDescription>
-              Enter details to generate a smart travel plan
+              AI-generated plan based on your selections
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-5">
-            <Input placeholder="From (e.g. Lahore)" value={from} onChange={(e) => setFrom(e.target.value)} />
-            <Input placeholder="Destination (e.g. Hunza)" value={destination} onChange={(e) => setDestination(e.target.value)} />
+          <CardContent className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <MapPin className="text-orange-500" />
+                <span className="font-medium">{trip.destination}</span>
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+              <div className="flex items-center gap-3">
+                <Calendar className="text-orange-500" />
+                <span>
+                  {trip.startDate} → {trip.endDate}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Users className="text-orange-500" />
+                <span>{trip.travelers} Travelers</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Car className="text-orange-500" />
+                <span>{trip.vehicle}</span>
+              </div>
             </div>
 
-            <Input type="number" placeholder="Travelers" value={travelers} onChange={(e) => setTravelers(e.target.value)} />
-            <Input type="number" placeholder="Budget (PKR)" value={budget} onChange={(e) => setBudget(e.target.value)} />
+            {/* ESTIMATION */}
+            <div className="bg-orange-50 p-4 rounded-lg space-y-3">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Wallet className="w-4 h-4" />
+                Estimated Cost
+              </h3>
 
-            <select
-              className="w-full border rounded-md px-3 py-2"
-              value={vehicle}
-              onChange={(e) => setVehicle(e.target.value)}
-            >
-              <option value="">Select Vehicle</option>
-              <option value="Car">Car</option>
-              <option value="Van">Van</option>
-              <option value="4x4 Jeep">4x4 Jeep</option>
-            </select>
+              <div className="text-sm text-gray-700 space-y-1">
+                <p>Vehicle (per day): <strong>PKR 8,000 – 15,000</strong></p>
+                <p>Fuel & Tolls: <strong>PKR 6,000</strong></p>
+                <p>Miscellaneous: <strong>PKR 4,000</strong></p>
+              </div>
 
-            <Button
-              onClick={handlePlanTrip}
-              disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600"
-            >
-              {loading ? 'Generating Plan...' : 'Generate Trip Plan'}
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
+              <Badge className="bg-orange-500 text-white w-fit">
+                Estimated Total: PKR 35,000+
+              </Badge>
+            </div>
           </CardContent>
         </Card>
-      </main>
+
+        {/* HIGHLIGHTS */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Why this plan works</CardTitle>
+          </CardHeader>
+          <CardContent className="grid md:grid-cols-3 gap-4 text-sm">
+            <div className="flex gap-2">
+              <CheckCircle className="text-green-600 w-4 h-4 mt-1" />
+              Vehicle matched with terrain
+            </div>
+            <div className="flex gap-2">
+              <CheckCircle className="text-green-600 w-4 h-4 mt-1" />
+              Suitable for group size
+            </div>
+            <div className="flex gap-2">
+              <CheckCircle className="text-green-600 w-4 h-4 mt-1" />
+              Optimized for budget & comfort
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ACTIONS */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <Button
+            className="bg-orange-500 hover:bg-orange-600"
+            onClick={() => alert('Trip confirmed! (Backend coming soon)')}
+          >
+            Confirm Trip
+          </Button>
+
+          <Button variant="outline" onClick={() => router.push('/dashboard')}>
+            Save to Dashboard
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
