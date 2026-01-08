@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -29,11 +28,10 @@ export default function PlanTripPage() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.replace('/signin');
+      router.push('/signin');
     }
   }, [router]);
 
-  // FORM STATE
   const [from, setFrom] = useState('');
   const [destination, setDestination] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -42,12 +40,9 @@ export default function PlanTripPage() {
   const [budget, setBudget] = useState('');
   const [vehicle, setVehicle] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  // 🚀 PLAN TRIP
   const handlePlanTrip = () => {
-    setError('');
-
+    // ❌ VALIDATION (professional rule)
     if (
       !from ||
       !destination ||
@@ -57,162 +52,82 @@ export default function PlanTripPage() {
       !budget ||
       !vehicle
     ) {
-      setError('❌ Please fill all required fields');
+      alert('❌ Please fill all required fields');
       return;
     }
 
     setLoading(true);
 
+    // Save trip temporarily (later DB)
+    localStorage.setItem(
+      'tripData',
+      JSON.stringify({
+        from,
+        destination,
+        startDate,
+        endDate,
+        travelers,
+        budget,
+        vehicle,
+      })
+    );
+
     setTimeout(() => {
-      setLoading(false);
-      alert('✅ Trip plan generated successfully!');
-    }, 1500);
+      router.push('/trip-result');
+    }, 1000);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* TOP NAVBAR */}
+      {/* NAVBAR */}
       <nav className="bg-white border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Plane className="text-orange-500" />
             <span className="font-bold text-xl">SMM Travel</span>
           </div>
-
-          <Link
-            href="/dashboard"
-            className="text-sm text-gray-600 hover:text-orange-500"
-          >
-            ← Back to Dashboard
-          </Link>
         </div>
       </nav>
 
-      {/* MAIN */}
+      {/* CONTENT */}
       <main className="max-w-3xl mx-auto px-6 py-10">
-        <Card className="shadow-lg">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">
-              Plan Your Trip ✈️
-            </CardTitle>
+            <CardTitle>Plan Your Trip ✈️</CardTitle>
             <CardDescription>
-              Enter complete details to generate your travel plan
+              Enter details to generate a smart travel plan
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-6">
-            {/* ERROR */}
-            {error && (
-              <p className="text-red-500 text-sm font-medium">{error}</p>
-            )}
+          <CardContent className="space-y-5">
+            <Input placeholder="From (e.g. Lahore)" value={from} onChange={(e) => setFrom(e.target.value)} />
+            <Input placeholder="Destination (e.g. Hunza)" value={destination} onChange={(e) => setDestination(e.target.value)} />
 
-            {/* FROM */}
-            <div>
-              <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-orange-500" />
-                From
-              </label>
-              <Input
-                placeholder="e.g. Lahore"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
 
-            {/* DESTINATION */}
-            <div>
-              <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-orange-500" />
-                Destination
-              </label>
-              <Input
-                placeholder="e.g. Hunza Valley"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-              />
-            </div>
+            <Input type="number" placeholder="Travelers" value={travelers} onChange={(e) => setTravelers(e.target.value)} />
+            <Input type="number" placeholder="Budget (PKR)" value={budget} onChange={(e) => setBudget(e.target.value)} />
 
-            {/* DATES */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-orange-500" />
-                  Start Date
-                </label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
+            <select
+              className="w-full border rounded-md px-3 py-2"
+              value={vehicle}
+              onChange={(e) => setVehicle(e.target.value)}
+            >
+              <option value="">Select Vehicle</option>
+              <option value="Car">Car</option>
+              <option value="Van">Van</option>
+              <option value="4x4 Jeep">4x4 Jeep</option>
+            </select>
 
-              <div>
-                <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-orange-500" />
-                  End Date
-                </label>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* TRAVELERS */}
-            <div>
-              <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                <Users className="w-4 h-4 text-orange-500" />
-                Travelers
-              </label>
-              <Input
-                type="number"
-                placeholder="e.g. 4"
-                value={travelers}
-                onChange={(e) => setTravelers(e.target.value)}
-              />
-            </div>
-
-            {/* BUDGET */}
-            <div>
-              <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-orange-500" />
-                Budget (PKR)
-              </label>
-              <Input
-                type="number"
-                placeholder="e.g. 150000"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-              />
-            </div>
-
-            {/* VEHICLE */}
-            <div>
-              <label className="text-sm font-medium mb-1 flex items-center gap-2">
-                <Car className="w-4 h-4 text-orange-500" />
-                Vehicle Type
-              </label>
-              <select
-                className="w-full border rounded-md px-3 py-2"
-                value={vehicle}
-                onChange={(e) => setVehicle(e.target.value)}
-              >
-                <option value="">Select vehicle</option>
-                <option value="car">Car (4 Seater)</option>
-                <option value="van">Van (7 Seater)</option>
-                <option value="coaster">Coaster (18 Seater)</option>
-                <option value="jeep">4x4 Jeep (Mountains)</option>
-              </select>
-            </div>
-
-            {/* ACTION */}
             <Button
               onClick={handlePlanTrip}
               disabled={loading}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full bg-orange-500 hover:bg-orange-600"
             >
-              {loading ? 'Planning...' : 'Generate Trip Plan'}
+              {loading ? 'Generating Plan...' : 'Generate Trip Plan'}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </CardContent>
