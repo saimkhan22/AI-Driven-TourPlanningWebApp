@@ -7,9 +7,6 @@ export function middleware(request: NextRequest) {
   const protectedRoutes = [
     '/dashboard',
     '/plan-trip',
-    '/hotels',
-    '/vehicles',
-    '/destinations',
   ];
 
   const isProtected = protectedRoutes.some((route) =>
@@ -18,18 +15,26 @@ export function middleware(request: NextRequest) {
 
   // If NOT logged in & trying to access protected page
   if (!token && isProtected) {
-    return NextResponse.redirect(new URL('/signin', request.url));
+    const url = new URL('/auth/signin', request.url);
+    url.searchParams.set('redirect', request.nextUrl.pathname);
+    return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  // Add security headers
+  const response = NextResponse.next();
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+
+  return response;
 }
 
 export const config = {
   matcher: [
     '/dashboard/:path*',
     '/plan-trip/:path*',
-    '/hotels/:path*',
-    '/vehicles/:path*',
-    '/destinations/:path*',
+    '/api/trips/:path*',
+    '/api/bookings/:path*',
   ],
 };

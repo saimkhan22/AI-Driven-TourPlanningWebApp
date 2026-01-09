@@ -12,9 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  MapPin, 
-  Calendar, 
+import {
+  MapPin,
+  Calendar,
   Users,
   Mountain,
   Waves,
@@ -32,7 +32,8 @@ import {
   CheckCircle,
   Sun,
   CloudSnow,
-  Thermometer
+  Thermometer,
+  Home
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -164,6 +165,125 @@ export default function DestinationsPage() {
         day2: 'Clifton Beach and Sea View',
         day3: 'Shopping and local cuisine'
       }
+    },
+    {
+      id: 7,
+      name: 'Murree',
+      region: 'Punjab',
+      type: 'Hill Station',
+      image: 'https://images.pexels.com/photos/1659438/pexels-photo-1659438.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&fit=crop',
+      rating: 4.5,
+      reviews: 1823,
+      price: 5500,
+      duration: '3 days',
+      weather: { temp: '16°C', condition: 'Pleasant' },
+      highlights: ['Mall Road', 'Patriata Chair Lift', 'Nathia Gali', 'Kashmir Point'],
+      bestFor: ['Families', 'Weekend Getaway', 'Nature'],
+      aiMatch: 82,
+      itinerary: {
+        day1: 'Mall Road shopping and Kashmir Point',
+        day2: 'Patriata Chair Lift and cable car',
+        day3: 'Nathia Gali forest walk'
+      }
+    },
+    {
+      id: 8,
+      name: 'Fairy Meadows',
+      region: 'Gilgit-Baltistan',
+      type: 'Mountain Paradise',
+      image: 'https://images.pexels.com/photos/1287460/pexels-photo-1287460.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&fit=crop',
+      rating: 4.9,
+      reviews: 1432,
+      price: 15000,
+      duration: '9 days',
+      weather: { temp: '10°C', condition: 'Cold' },
+      highlights: ['Nanga Parbat View', 'Beyal Camp', 'Raikot Bridge', 'Tato Village'],
+      bestFor: ['Trekking', 'Adventure', 'Photography'],
+      aiMatch: 94,
+      itinerary: {
+        day1: 'Raikot Bridge to Tato Village jeep ride',
+        day2: 'Trek to Fairy Meadows base camp',
+        day3: 'Nanga Parbat viewpoint and photography'
+      }
+    },
+    {
+      id: 9,
+      name: 'Neelum Valley',
+      region: 'Azad Kashmir',
+      type: 'Valley Paradise',
+      image: 'https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&fit=crop',
+      rating: 4.8,
+      reviews: 1654,
+      price: 9000,
+      duration: '7 days',
+      weather: { temp: '20°C', condition: 'Pleasant' },
+      highlights: ['Keran', 'Arang Kel', 'Sharda', 'Kel', 'Taobat'],
+      bestFor: ['Nature', 'Adventure', 'Honeymoon'],
+      aiMatch: 91,
+      itinerary: {
+        day1: 'Muzaffarabad to Keran scenic drive',
+        day2: 'Arang Kel chairlift and trek',
+        day3: 'Sharda University ruins and Neelum River'
+      }
+    },
+    {
+      id: 10,
+      name: 'Islamabad',
+      region: 'Capital Territory',
+      type: 'Modern Capital',
+      image: 'https://images.pexels.com/photos/1470405/pexels-photo-1470405.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&fit=crop',
+      rating: 4.6,
+      reviews: 987,
+      price: 4500,
+      duration: '3 days',
+      weather: { temp: '25°C', condition: 'Clear' },
+      highlights: ['Faisal Mosque', 'Daman-e-Koh', 'Lok Virsa', 'Margalla Hills'],
+      bestFor: ['Families', 'Culture', 'Hiking'],
+      aiMatch: 79,
+      itinerary: {
+        day1: 'Faisal Mosque and Pakistan Monument',
+        day2: 'Margalla Hills trail and Daman-e-Koh',
+        day3: 'Lok Virsa Museum and local markets'
+      }
+    },
+    {
+      id: 11,
+      name: 'Chitral',
+      region: 'Khyber Pakhtunkhwa',
+      type: 'Mountain Valley',
+      image: 'https://images.pexels.com/photos/1619317/pexels-photo-1619317.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&fit=crop',
+      rating: 4.7,
+      reviews: 876,
+      price: 11000,
+      duration: '8 days',
+      weather: { temp: '14°C', condition: 'Cool' },
+      highlights: ['Kalash Valley', 'Shandur Pass', 'Chitral Fort', 'Garam Chashma'],
+      bestFor: ['Culture', 'Adventure', 'Photography'],
+      aiMatch: 86,
+      itinerary: {
+        day1: 'Chitral city and fort exploration',
+        day2: 'Kalash Valley cultural experience',
+        day3: 'Shandur Pass and polo ground'
+      }
+    },
+    {
+      id: 12,
+      name: 'Mohenjo-daro',
+      region: 'Sindh',
+      type: 'Historical Site',
+      image: 'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg?auto=compress&cs=tinysrgb&w=500&h=300&fit=crop',
+      rating: 4.5,
+      reviews: 543,
+      price: 3500,
+      duration: '2 days',
+      weather: { temp: '35°C', condition: 'Hot' },
+      highlights: ['Ancient Ruins', 'Museum', 'Great Bath', 'Indus Valley Civilization'],
+      bestFor: ['History', 'Education', 'Culture'],
+      aiMatch: 75,
+      itinerary: {
+        day1: 'Archaeological site tour and museum',
+        day2: 'Detailed exploration and photography'
+      }
     }
   ];
 
@@ -194,13 +314,20 @@ export default function DestinationsPage() {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <Link
-  href={isLoggedIn ? '/dashboard' : '/'}
-  className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500"
->
-  ← Back to {isLoggedIn ? 'Dashboard' : 'Home'}
-</Link>
+                href={isLoggedIn ? '/dashboard' : '/'}
+                className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to {isLoggedIn ? 'Dashboard' : 'Home'}
+              </Link>
+              <Link href="/">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <Home className="w-4 h-4" />
+                  Home
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="outline" size="sm">

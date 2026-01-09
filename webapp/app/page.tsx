@@ -86,6 +86,34 @@ export default function Home() {
       highlights: ['Kalam', 'Malam Jabba', 'Ushu Forest']
     },
     {
+      name: 'Naran Kaghan',
+      region: 'Khyber Pakhtunkhwa',
+      image: 'https://images.pexels.com/photos/1450353/pexels-photo-1450353.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      description: 'Pristine lakes and lush meadows',
+      highlights: ['Lake Saif-ul-Malook', 'Lalazar', 'Babusar Top']
+    },
+    {
+      name: 'Murree',
+      region: 'Punjab',
+      image: 'https://images.pexels.com/photos/1659438/pexels-photo-1659438.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      description: 'Hill station with colonial charm',
+      highlights: ['Mall Road', 'Patriata', 'Nathia Gali']
+    },
+    {
+      name: 'Fairy Meadows',
+      region: 'Gilgit-Baltistan',
+      image: 'https://images.pexels.com/photos/1287460/pexels-photo-1287460.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      description: 'Base camp for Nanga Parbat views',
+      highlights: ['Nanga Parbat View', 'Beyal Camp', 'Raikot Bridge']
+    },
+    {
+      name: 'Neelum Valley',
+      region: 'Azad Kashmir',
+      image: 'https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
+      description: 'Paradise on earth with crystal rivers',
+      highlights: ['Keran', 'Arang Kel', 'Sharda']
+    },
+    {
       name: 'Lahore',
       region: 'Punjab',
       image: 'https://images.pexels.com/photos/739407/pexels-photo-739407.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop',
@@ -352,10 +380,12 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  <Button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white border-0">
-                    Explore
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
+                  <Link href={`/destinations?search=${encodeURIComponent(destination.name)}`}>
+                    <Button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white border-0">
+                      Explore
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -451,10 +481,17 @@ export default function Home() {
             Join thousands of travelers discovering Pakistan's beauty with AI-powered planning
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4">
-              Start Planning Your Trip
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900">
+            <Link href="/plan-trip">
+              <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4">
+                Start Planning Your Trip
+              </Button>
+            </Link>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-gray-900"
+              onClick={() => setIsChatOpen(true)}
+            >
               <MessageCircle className="w-5 h-5 mr-2" />
               Chat with AI Guide
             </Button>

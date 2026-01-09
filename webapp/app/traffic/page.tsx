@@ -5,414 +5,343 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Navigation, Clock, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Circle as XCircle, ArrowLeft, Route, Car, Timer, TrendingUp, Zap, Mountain, CloudRain, Sun } from 'lucide-react';
+import { MapPin, Navigation, Clock, ArrowLeft, Home, Loader2, TrendingDown, Star } from 'lucide-react';
 import Link from 'next/link';
-import TrafficMap from '@/components/map/TrafficMap';
+import RealTimeTrafficMap from '@/components/map/RealTimeTrafficMap';
+import { findOptimalRoute, getAlternativeRoutes, type OptimizedRoute } from '@/lib/routeOptimization';
 
 export default function TrafficPage() {
   const [fromLocation, setFromLocation] = useState('');
   const [toLocation, setToLocation] = useState('');
-  const [sortBy, setSortBy] = useState('recommended');
+  const [showMap, setShowMap] = useState(true); // Show map by default
+  const [trafficData, setTrafficData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [optimizedRoutes, setOptimizedRoutes] = useState<OptimizedRoute[]>([]);
+  const [showRouteDetails, setShowRouteDetails] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const trafficData = [
-    {
-      route: 'Islamabad to Lahore (M2 Motorway)',
-      distance: '375 km',
-      normalTime: '4 hours',
-      currentTime: '4 hours 30 min',
-      delay: '30 min',
-      status: 'moderate',
-      incidents: ['Fog near Kallar Kahar', 'Heavy traffic at Lahore toll'],
-      color: 'yellow',
-      weather: 'Foggy'
-    },
-    {
-      route: 'Karachi to Hyderabad (M9)',
-      distance: '165 km',
-      normalTime: '2 hours',
-      currentTime: '3 hours 15 min',
-      delay: '1 hour 15 min',
-      status: 'heavy',
-      incidents: ['Road construction near Kotri', 'Accident at Super Highway'],
-      color: 'red',
-      weather: 'Hot'
-    },
-    {
-      route: 'Islamabad to Murree',
-      distance: '65 km',
-      normalTime: '1 hour 30 min',
-      currentTime: '1 hour 30 min',
-      delay: '0 min',
-      status: 'clear',
-      incidents: [],
-      color: 'green',
-      weather: 'Clear'
-    },
-    {
-      route: 'Peshawar to Chitral',
-      distance: '320 km',
-      normalTime: '7 hours',
-      currentTime: '8 hours 30 min',
-      delay: '1 hour 30 min',
-      status: 'heavy',
-      incidents: ['Landslide near Dir', 'Road maintenance at Lowari Pass'],
-      color: 'red',
-      weather: 'Rainy'
+  const handleCheckTraffic = async () => {
+    if (!fromLocation || !toLocation) {
+      alert('Please enter both origin and destination');
+      return;
     }
-  ];
 
-  const routeOptions = [
-    {
-      name: 'Fastest Route (M2 Motorway)',
-      time: '4 hours 15 min',
-      distance: '375 km',
-      traffic: 'Light traffic',
-      highlights: ['Toll motorway', 'Rest areas available', 'Well maintained'],
-      savings: '45 min faster',
-      recommended: true,
-      weather: 'Clear skies'
-    },
-    {
-      name: 'Scenic Route (GT Road)',
-      time: '6 hours 30 min',
-      distance: '385 km',
-      traffic: 'Moderate traffic',
-      highlights: ['Historical sites', 'Local food stops', 'Cultural experience'],
-      savings: 'Most scenic',
-      weather: 'Partly cloudy'
-    },
-    {
-      name: 'Alternative Route (N5)',
-      time: '5 hours 45 min',
-      distance: '390 km',
-      traffic: 'Heavy traffic',
-      highlights: ['Bypass major cities', 'Truck route', 'Industrial areas'],
-      savings: 'Avoid city traffic',
-      weather: 'Sunny'
+    setLoading(true);
+    setShowMap(true);
+    setShowRouteDetails(true);
+
+    try {
+      // Calculate optimal routes using metaheuristic algorithm
+      const routes = getAlternativeRoutes(fromLocation, toLocation);
+      setOptimizedRoutes(routes);
+
+      // Fetch real-time traffic data from Google Maps
+      const response = await fetch(
+        `/api/traffic/route?origin=${encodeURIComponent(fromLocation)}&destination=${encodeURIComponent(toLocation)}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        setTrafficData(data.traffic);
+      } else {
+        // Even if API fails, we still have optimized routes
+        console.log('Traffic API failed, showing optimized routes only');
+      }
+    } catch (error) {
+      console.error('Error fetching traffic:', error);
+      // Don't show alert, just log - we still have route optimization
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'clear': return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'moderate': return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
-      case 'heavy': return <XCircle className="w-5 h-5 text-red-500" />;
-      default: return <Clock className="w-5 h-5 text-gray-500" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'clear': return 'bg-green-100 text-green-800';
-      case 'moderate': return 'bg-yellow-100 text-yellow-800';
-      case 'heavy': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getWeatherIcon = (weather: string) => {
-    if (weather.includes('Rain') || weather.includes('Fog')) return <CloudRain className="w-4 h-4 text-blue-500" />;
-    return <Sun className="w-4 h-4 text-yellow-500" />;
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center text-emerald-600 hover:text-emerald-700">
-                <ArrowLeft className="w-5 h-5 mr-2" />
-                Back to Home
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
-                Last updated: {currentTime.toLocaleTimeString()}
-              </div>
-              <Button variant="outline" size="sm">
-                <Zap className="w-4 h-4 mr-2" />
-                Live Updates
+      <nav className="bg-white border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Dashboard
               </Button>
-            </div>
+            </Link>
+            <h1 className="text-xl font-bold">Real-Time Traffic Updates</h1>
           </div>
+          <Link href="/">
+            <Button variant="outline" className="flex items-center gap-2">
+              <Home className="w-4 h-4" />
+              Home
+            </Button>
+          </Link>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Live Traffic Insights for Pakistan</h1>
-          <p className="text-lg text-gray-600">AI-powered route optimization with real-time traffic and weather data</p>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <Navigation className="w-8 h-8 text-orange-500" />
+              <div>
+                <h2 className="text-2xl font-bold">Live Traffic Monitoring</h2>
+                <p className="text-gray-600">Real-time traffic conditions powered by Google Maps</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Current Time</p>
+              <p className="text-lg font-semibold">{currentTime.toLocaleTimeString()}</p>
+            </div>
+          </div>
         </div>
 
-        {/* Live Traffic Map */}
-        <div className="mb-8">
-          <Card>
+        {/* Popular Routes - Quick Access */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Popular Pakistan Routes</CardTitle>
+            <CardDescription>
+              Click on any route to check real-time traffic conditions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                { from: 'Islamabad', to: 'Lahore', distance: '375 km', icon: '🏛️' },
+                { from: 'Karachi', to: 'Hyderabad', distance: '165 km', icon: '🌊' },
+                { from: 'Lahore', to: 'Multan', distance: '340 km', icon: '🕌' },
+                { from: 'Islamabad', to: 'Peshawar', distance: '180 km', icon: '⛰️' },
+                { from: 'Karachi', to: 'Sukkur', distance: '470 km', icon: '🏜️' },
+                { from: 'Lahore', to: 'Faisalabad', distance: '130 km', icon: '🏭' },
+                { from: 'Islamabad', to: 'Murree', distance: '60 km', icon: '🏔️' },
+                { from: 'Rawalpindi', to: 'Abbottabad', distance: '120 km', icon: '🌲' },
+                { from: 'Lahore', to: 'Sialkot', distance: '125 km', icon: '⚽' },
+                { from: 'Karachi', to: 'Thatta', distance: '100 km', icon: '🏛️' },
+                { from: 'Islamabad', to: 'Muzaffarabad', distance: '140 km', icon: '🏞️' },
+                { from: 'Peshawar', to: 'Swat', distance: '170 km', icon: '🌄' },
+              ].map((route, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-start hover:bg-orange-50 hover:border-orange-500 transition-all"
+                  onClick={() => {
+                    setFromLocation(route.from);
+                    setToLocation(route.to);
+                    setTimeout(() => handleCheckTraffic(), 100);
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-2xl">{route.icon}</span>
+                    <span className="font-semibold text-sm">{route.from} → {route.to}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">{route.distance}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Search Form */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Custom Route Traffic Check</CardTitle>
+            <CardDescription>
+              Enter any origin and destination in Pakistan to see real-time traffic
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">From</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="e.g., Islamabad"
+                    value={fromLocation}
+                    onChange={(e) => setFromLocation(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">To</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="e.g., Lahore"
+                    value={toLocation}
+                    onChange={(e) => setToLocation(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">&nbsp;</label>
+                <Button
+                  onClick={handleCheckTraffic}
+                  className="w-full bg-orange-500 hover:bg-orange-600"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Navigation className="w-4 h-4 mr-2" />
+                      Check Traffic
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Optimized Routes Display */}
+        {showRouteDetails && optimizedRoutes.length > 0 && (
+          <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <MapPin className="w-5 h-5 mr-2" />
-                Live Traffic Map - Pakistan
+              <CardTitle className="flex items-center gap-2">
+                <TrendingDown className="w-5 h-5 text-green-500" />
+                Optimized Routes (AI-Powered)
               </CardTitle>
               <CardDescription>
-                Real-time traffic incidents, road closures, and congestion updates across Pakistan
+                Routes calculated using advanced metaheuristic algorithms (A* & Dijkstra)
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <TrafficMap />
-            </CardContent>
-          </Card>
-        </div>
+              <div className="space-y-4">
+                {optimizedRoutes.map((route, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border-2 ${
+                      route.isOptimal
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-lg">
+                          Route {index + 1}
+                          {route.isOptimal && (
+                            <Badge className="ml-2 bg-green-500">
+                              <Star className="w-3 h-3 mr-1" />
+                              Optimal
+                            </Badge>
+                          )}
+                        </h3>
+                      </div>
+                      <Badge variant="outline">{route.algorithm.toUpperCase()}</Badge>
+                    </div>
 
-        {/* Route Planner */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Route className="w-5 h-5 mr-2" />
-              Plan Your Route in Pakistan
-            </CardTitle>
-            <CardDescription>
-              Get the fastest route with real-time traffic updates and weather conditions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">From</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Select value={fromLocation} onValueChange={setFromLocation}>
-                    <SelectTrigger className="pl-10">
-                      <SelectValue placeholder="Select starting city" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="islamabad">Islamabad</SelectItem>
-                      <SelectItem value="lahore">Lahore</SelectItem>
-                      <SelectItem value="karachi">Karachi</SelectItem>
-                      <SelectItem value="peshawar">Peshawar</SelectItem>
-                      <SelectItem value="quetta">Quetta</SelectItem>
-                      <SelectItem value="multan">Multan</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">To</label>
-                <div className="relative">
-                  <Navigation className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Select value={toLocation} onValueChange={setToLocation}>
-                    <SelectTrigger className="pl-10">
-                      <SelectValue placeholder="Select destination" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hunza">Hunza Valley</SelectItem>
-                      <SelectItem value="skardu">Skardu</SelectItem>
-                      <SelectItem value="swat">Swat Valley</SelectItem>
-                      <SelectItem value="murree">Murree</SelectItem>
-                      <SelectItem value="naran">Naran Kaghan</SelectItem>
-                      <SelectItem value="chitral">Chitral</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-            <Button className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
-              <Navigation className="w-4 h-4 mr-2" />
-              Get Directions
-            </Button>
-          </CardContent>
-        </Card>
+                    <div className="grid md:grid-cols-4 gap-4 mb-3">
+                      <div>
+                        <p className="text-sm text-gray-600">Distance</p>
+                        <p className="font-semibold text-lg">{route.totalDistance} km</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Est. Time</p>
+                        <p className="font-semibold text-lg">
+                          {Math.floor(route.totalTime / 60)}h {route.totalTime % 60}m
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Est. Cost</p>
+                        <p className="font-semibold text-lg">PKR {route.estimatedCost.toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Stops</p>
+                        <p className="font-semibold text-lg">{route.path.length - 2}</p>
+                      </div>
+                    </div>
 
-        {/* Current Traffic Overview */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">Current Traffic Conditions</h2>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recommended">Recommended</SelectItem>
-                <SelectItem value="fastest">Fastest Route</SelectItem>
-                <SelectItem value="shortest">Shortest Distance</SelectItem>
-                <SelectItem value="least-traffic">Least Traffic</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {trafficData.map((traffic, index) => (
-              <Card key={index} className="border-l-4" style={{ borderLeftColor: traffic.color === 'green' ? '#10b981' : traffic.color === 'yellow' ? '#f59e0b' : '#ef4444' }}>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{traffic.route}</CardTitle>
-                    <div className="flex items-center space-x-2">
-                      {getStatusIcon(traffic.status)}
-                      {getWeatherIcon(traffic.weather)}
+                    <div className="mt-3 pt-3 border-t">
+                      <p className="text-sm text-gray-600 mb-2">Route Path:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {route.path.map((city, idx) => (
+                          <div key={idx} className="flex items-center">
+                            <Badge variant="secondary">{city}</Badge>
+                            {idx < route.path.length - 1 && (
+                              <span className="mx-2 text-gray-400">→</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <CardDescription className="text-sm text-gray-600">
-                    {traffic.distance} • Normal: {traffic.normalTime}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Current Time:</span>
-                      <span className="text-lg font-bold">{traffic.currentTime}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Delay:</span>
-                      <Badge className={getStatusColor(traffic.status)}>
-                        +{traffic.delay}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Weather:</span>
-                      <span className="text-sm text-gray-600">{traffic.weather}</span>
-                    </div>
-                    {traffic.incidents.length > 0 && (
-                      <div className="mt-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Current Issues:</h4>
-                        <ul className="space-y-1">
-                          {traffic.incidents.map((incident, i) => (
-                            <li key={i} className="text-xs text-gray-600 flex items-start">
-                              <AlertTriangle className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" />
-                              {incident}
-                            </li>
-                          ))}
-                        </ul>
+
+                    {route.isOptimal && (
+                      <div className="mt-3 p-2 bg-green-100 rounded text-sm text-green-800">
+                        ✓ This is the shortest route with minimum distance and cost
                       </div>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Route Options */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Recommended Routes</h2>
-          <div className="space-y-4">
-            {routeOptions.map((route, index) => (
-              <Card key={index} className={`${route.recommended ? 'ring-2 ring-emerald-500' : ''}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{route.name}</h3>
-                        {route.recommended && (
-                          <Badge className="ml-2 bg-emerald-100 text-emerald-800">AI Recommended</Badge>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-3">
-                        <div className="flex items-center">
-                          <Timer className="w-4 h-4 mr-1" />
-                          {route.time}
-                        </div>
-                        <div className="flex items-center">
-                          <Car className="w-4 h-4 mr-1" />
-                          {route.distance}
-                        </div>
-                        <div className="flex items-center">
-                          <TrendingUp className="w-4 h-4 mr-1" />
-                          {route.traffic}
-                        </div>
-                        <div className="flex items-center">
-                          {getWeatherIcon(route.weather)}
-                          <span className="ml-1">{route.weather}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {route.highlights.map((highlight, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
-                            {highlight}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="text-sm font-medium text-emerald-600">
-                        {route.savings}
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <Button 
-                        variant={route.recommended ? "default" : "outline"}
-                        className={route.recommended ? "bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700" : ""}
-                      >
-                        Select Route
-                      </Button>
-                    </div>
+        {/* Traffic Data Display */}
+        {trafficData && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Real-Time Traffic Information</CardTitle>
+              <CardDescription>Live data from Google Maps</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Duration</p>
+                    <p className="font-semibold">{trafficData.duration}</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Traffic Insights */}
-        <Card>
-          <CardHeader>
-            <CardTitle>AI Traffic Insights for Pakistan</CardTitle>
-            <CardDescription>
-              Smart predictions based on Pakistani traffic patterns and weather conditions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Peak Traffic Times</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Morning Rush</span>
-                    <Badge variant="secondary">8:00 AM - 10:00 AM</Badge>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-green-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Distance</p>
+                    <p className="font-semibold">{trafficData.distance}</p>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Evening Rush</span>
-                    <Badge variant="secondary">5:00 PM - 8:00 PM</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Friday Prayer Time</span>
-                    <Badge variant="secondary">12:00 PM - 2:00 PM</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Best Travel Time</span>
-                    <Badge className="bg-green-100 text-green-800">10:00 AM - 4:00 PM</Badge>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Navigation className="w-5 h-5 text-orange-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">In Traffic</p>
+                    <p className="font-semibold">{trafficData.durationInTraffic || trafficData.duration}</p>
                   </div>
                 </div>
               </div>
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Smart Recommendations</h4>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 mr-2 mt-0.5 text-green-500" />
-                    Avoid GT Road during peak hours - use motorways
-                  </li>
-                  <li className="flex items-start">
-                    <Mountain className="w-4 h-4 mr-2 mt-0.5 text-green-500" />
-                    Northern areas best visited in summer months
-                  </li>
-                  <li className="flex items-start">
-                    <CloudRain className="w-4 h-4 mr-2 mt-0.5 text-green-500" />
-                    Check weather alerts for mountain passes
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 mr-2 mt-0.5 text-green-500" />
-                    Fuel up before long journeys - stations may be sparse
-                  </li>
-                </ul>
-              </div>
-            </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Real-Time Traffic Map */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Live Traffic Map</CardTitle>
+            <CardDescription>
+              Green = Light traffic, Yellow = Moderate traffic, Red = Heavy traffic
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RealTimeTrafficMap 
+              origin={fromLocation} 
+              destination={toLocation}
+            />
           </CardContent>
         </Card>
-      </div>
+      </main>
     </div>
   );
 }
+

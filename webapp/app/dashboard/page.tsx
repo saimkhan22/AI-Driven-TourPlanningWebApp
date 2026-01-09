@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,9 +24,83 @@ import {
   Wallet,
   ShieldAlert,
   BookOpen,
+  Calendar,
+  Users,
+  DollarSign,
+  Clock,
+  Trash2,
+  Eye,
+  Home,
 } from 'lucide-react';
 
+interface Trip {
+  _id: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  duration: number;
+  budget: number;
+  travelers: number;
+  interests: string[];
+  vehicle?: string;
+  estimatedCost?: {
+    total: number;
+  };
+  createdAt: string;
+}
+
 export default function DashboardPage() {
+  const router = useRouter();
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('Traveler');
+
+  useEffect(() => {
+    fetchTrips();
+    // Get user name from localStorage or cookie
+    const storedName = localStorage.getItem('userName');
+    if (storedName) setUserName(storedName);
+  }, []);
+
+  const fetchTrips = async () => {
+    try {
+      const response = await fetch('/api/trips/my-trips');
+      if (response.ok) {
+        const data = await response.json();
+        setTrips(data.trips || []);
+      }
+    } catch (error) {
+      console.error('Error fetching trips:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      localStorage.removeItem('userName');
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const deleteTrip = async (tripId: string) => {
+    if (!confirm('Are you sure you want to delete this trip?')) return;
+
+    try {
+      const response = await fetch(`/api/trips/${tripId}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setTrips(trips.filter(trip => trip._id !== tripId));
+      }
+    } catch (error) {
+      console.error('Error deleting trip:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* TOP NAVBAR */}
@@ -48,8 +124,16 @@ export default function DashboardPage() {
             <Link href="/vehicles" className="font-medium text-gray-700 hover:text-orange-500">
               Vehicles
             </Link>
-
-            <Button variant="outline">Logout</Button>
+            <Link href="/traffic" className="font-medium text-gray-700 hover:text-orange-500">
+              Traffic
+            </Link>
+            <Link href="/">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
+            </Link>
+            <Button variant="outline" onClick={handleLogout}>Logout</Button>
           </div>
         </div>
       </nav>
@@ -59,11 +143,65 @@ export default function DashboardPage() {
         {/* WELCOME */}
         <section className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back 👋
+            Welcome back, {userName}! 👋
           </h1>
           <p className="text-gray-600">
             Plan your next journey across Pakistan with AI-powered assistance.
           </p>
+        </section>
+
+        {/* TRIP STATISTICS */}
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Trips</p>
+                  <p className="text-2xl font-bold">{trips.length}</p>
+                </div>
+                <MapPin className="w-8 h-8 text-orange-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Budget</p>
+                  <p className="text-2xl font-bold">
+                    PKR {trips.reduce((sum, trip) => sum + (trip.budget || 0), 0).toLocaleString()}
+                  </p>
+                </div>
+                <DollarSign className="w-8 h-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Days</p>
+                  <p className="text-2xl font-bold">
+                    {trips.reduce((sum, trip) => sum + (trip.duration || 0), 0)}
+                  </p>
+                </div>
+                <Clock className="w-8 h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Travelers</p>
+                  <p className="text-2xl font-bold">
+                    {trips.reduce((sum, trip) => sum + (trip.travelers || 0), 0)}
+                  </p>
+                </div>
+                <Users className="w-8 h-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* QUICK ACTIONS */}
@@ -114,6 +252,104 @@ export default function DashboardPage() {
               </Button>
             </CardContent>
           </Card>
+        </section>
+
+        {/* TRIP HISTORY */}
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Your Trip History</h2>
+            <Link href="/plan-trip">
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                + New Trip
+              </Button>
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Loading your trips...</p>
+            </div>
+          ) : trips.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No trips yet</h3>
+                <p className="text-gray-600 mb-6">
+                  Start planning your first adventure with AI!
+                </p>
+                <Link href="/plan-trip">
+                  <Button className="bg-orange-500 hover:bg-orange-600">
+                    Plan Your First Trip
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {trips.map((trip) => (
+                <Card key={trip._id} className="hover:shadow-lg transition">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg">{trip.destination}</CardTitle>
+                        <CardDescription>
+                          {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
+                        </CardDescription>
+                      </div>
+                      <MapPin className="w-5 h-5 text-orange-500" />
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-500" />
+                        <span>{trip.duration} days</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-gray-500" />
+                        <span>{trip.travelers} travelers</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-gray-500" />
+                        <span>PKR {trip.budget?.toLocaleString()}</span>
+                      </div>
+                      {trip.interests && trip.interests.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {trip.interests.slice(0, 3).map((interest, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded"
+                            >
+                              {interest}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => router.push(`/trip/${trip._id}`)}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => deleteTrip(trip._id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* SERVICES */}

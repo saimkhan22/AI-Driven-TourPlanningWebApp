@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,7 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,20 +26,11 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else {
-        router.push('/dashboard');
-        router.refresh();
-      }
-    } catch (error) {
-      setError('An error occurred. Please try again.');
+      await login(email, password);
+      router.push('/dashboard');
+      router.refresh();
+    } catch (error: any) {
+      setError(error.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
