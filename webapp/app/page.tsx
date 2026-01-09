@@ -265,7 +265,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
 
   {/* Plan Your Trip → Signup */}
- <Link href="/plan-trip">
+ <Link href="/plan-trip?fresh=true">
 
   <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
     Plan Your Trip

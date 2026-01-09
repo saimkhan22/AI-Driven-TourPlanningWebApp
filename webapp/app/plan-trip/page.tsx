@@ -1,8 +1,18 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -28,6 +38,10 @@ type TripPlan = {
 };
 
 export default function PlanResultPage() {
+    const searchParams = useSearchParams();
+const isFresh = searchParams.get('fresh');
+
+
   const router = useRouter();
   const [trip, setTrip] = useState<TripPlan | null>(null);
 
@@ -52,13 +66,20 @@ export default function PlanResultPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 flex justify-center">
       <div className="w-full max-w-4xl space-y-6">
-        
+
         {/* HEADER */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" onClick={() => router.push('/plan-trip')}>
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </Button>
+          {/* ✅ FIXED BACK BUTTON */}
+          <Link href="/plan-trip">
+            <button
+  onClick={() => router.back()}
+  className="flex items-center gap-2 text-sm text-gray-600 hover:text-orange-500"
+>
+  ← Back to Plan Trip
+</button>
+
+          </Link>
+
           <h1 className="text-2xl font-bold">Your Trip Plan ✨</h1>
         </div>
 
