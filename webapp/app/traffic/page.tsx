@@ -5,11 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Navigation, Clock, ArrowLeft, Home, Loader2, TrendingDown, Star, Map, ExternalLink } from 'lucide-react';
+import { MapPin, Navigation, Clock, ArrowLeft, Home, Loader2, TrendingDown, Star, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import RealTimeTrafficMap from '@/components/map/RealTimeTrafficMap';
-import RouteDirectionMap from '@/components/map/RouteDirectionMap';
-import { findOptimalRoute, getAlternativeRoutes, type OptimizedRoute } from '@/lib/routeOptimization';
+import { getAlternativeRoutes, type OptimizedRoute } from '@/lib/routeOptimization';
 
 export default function TrafficPage() {
   const [fromLocation, setFromLocation] = useState('');
@@ -333,19 +332,6 @@ export default function TrafficPage() {
                       <p className="text-xs text-gray-500 mt-2 text-center">
                         Opens in new tab with real-time traffic & navigation
                       </p>
-                    </div>
-
-                    {/* Direction Map for this route */}
-                    <div className="mt-4 pt-4 border-t">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Map className="w-4 h-4 text-orange-500" />
-                        <h4 className="font-semibold text-sm">Route Preview</h4>
-                      </div>
-                      <RouteDirectionMap
-                        origin={route.path[0]}
-                        destination={route.path[route.path.length - 1]}
-                        waypoints={route.path.slice(1, -1)}
-                      />
                     </div>
                   </div>
                 ))}
