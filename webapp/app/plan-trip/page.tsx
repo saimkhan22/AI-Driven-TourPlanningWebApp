@@ -31,6 +31,7 @@ import {
   TrendingDown,
   Star,
 } from 'lucide-react';
+import TourConfirmationToast from '@/components/TourConfirmationToast';
 
 interface TripPlan {
   destination: string;
@@ -75,6 +76,7 @@ export default function PlanTripPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [optimizedRoutes, setOptimizedRoutes] = useState<any[]>([]);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
+  const [showConfirmationToast, setShowConfirmationToast] = useState(false);
 
   // Form state
   const [destination, setDestination] = useState('');
@@ -249,6 +251,41 @@ export default function PlanTripPage() {
           estimatedCost: data.tripPlan.estimatedCost,
         }),
       });
+
+      // Send tour confirmation notification (SMS & Email)
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+
+      if (token) {
+        try {
+          const notifResponse = await fetch('/api/notifications/tour-confirmation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              destination,
+              duration: parseInt(duration),
+              travelers: parseInt(travelers),
+              estimatedCost: data.tripPlan.estimatedCost?.total,
+              startDate,
+              itinerary: data.tripPlan.itinerary,
+            }),
+          });
+
+          if (notifResponse.ok) {
+            console.log('✅ Tour confirmation sent via SMS & Email');
+            // Show professional toast notification
+            setShowConfirmationToast(true);
+          }
+        } catch (notifError) {
+          console.error('Failed to send tour confirmation:', notifError);
+          // Don't fail the whole process if notification fails
+        }
+      }
     } catch (error: any) {
       alert(error.message || 'Failed to generate trip plan. Please try again.');
       console.error('Trip plan error:', error);
@@ -268,9 +305,15 @@ export default function PlanTripPage() {
 
   if (tripPlan) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
-          {/* Header */}
+      <>
+        <TourConfirmationToast
+          show={showConfirmationToast}
+          onClose={() => setShowConfirmationToast(false)}
+          destination={destination}
+        />
+        <div className="min-h-screen bg-gray-50 p-6">
+          <div className="max-w-6xl mx-auto space-y-6">
+            {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button
@@ -509,6 +552,7 @@ export default function PlanTripPage() {
           </Card>
         </div>
       </div>
+      </>
     );
   }
 

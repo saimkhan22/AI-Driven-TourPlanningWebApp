@@ -4,15 +4,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { 
-  MapPin, 
-  Car, 
-  Hotel, 
-  Navigation, 
-  Search, 
-  Star, 
-  Clock, 
-  Users, 
+import {
+  MapPin,
+  Car,
+  Hotel,
+  Navigation,
+  Search,
+  Star,
+  Clock,
+  Users,
   Sparkles,
   ArrowRight,
   MessageCircle,
@@ -29,6 +29,7 @@ import {
 import Link from 'next/link';
 import UserMenu from '@/components/auth/UserMenu';
 import AITravelBot from '@/components/chat/AITravelBot';
+import PlanTripButton from '@/components/plantripbutton';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -291,27 +292,25 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              {/* Plan Your Trip → Requires Auth */}
+              <PlanTripButton
+                size="lg"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full text-lg font-medium"
+              >
+                Plan Your Trip
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </PlanTripButton>
 
-  {/* Plan Your Trip → Signup */}
- <Link href="/plan-trip?fresh=true">
-
-  <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
-    Plan Your Trip
-    <ArrowRight className="w-5 h-5 ml-2" />
-  </Button>
-</Link>
-
-
-  {/* Explore Destinations → Destinations */}
-  <Link href="/destinations" className="inline-block">
-    <Button
-      size="lg"
-      variant="outline"
-      className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-medium bg-transparent"
-    >
-      Explore Destinations
-    </Button>
-  </Link>
+              {/* Explore Destinations → Destinations */}
+              <Link href="/destinations" className="inline-block">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-medium bg-transparent"
+                >
+                  Explore Destinations
+                </Button>
+              </Link>
 
 </div>
 
@@ -481,11 +480,12 @@ export default function Home() {
             Join thousands of travelers discovering Pakistan's beauty with AI-powered planning
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/plan-trip">
-              <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4">
-                Start Planning Your Trip
-              </Button>
-            </Link>
+            <PlanTripButton
+              size="lg"
+              className="bg-orange-500 hover:bg-orange-600 text-white border-0 px-8 py-4"
+            >
+              Start Planning Your Trip
+            </PlanTripButton>
             <Button
               size="lg"
               variant="outline"

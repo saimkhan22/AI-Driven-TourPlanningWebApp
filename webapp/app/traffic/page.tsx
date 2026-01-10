@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Navigation, Clock, ArrowLeft, Home, Loader2, TrendingDown, Star } from 'lucide-react';
+import { MapPin, Navigation, Clock, ArrowLeft, Home, Loader2, TrendingDown, Star, Map, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import RealTimeTrafficMap from '@/components/map/RealTimeTrafficMap';
+import RouteDirectionMap from '@/components/map/RouteDirectionMap';
 import { findOptimalRoute, getAlternativeRoutes, type OptimizedRoute } from '@/lib/routeOptimization';
 
 export default function TrafficPage() {
@@ -58,6 +59,23 @@ export default function TrafficPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to open Google Maps with directions
+  const openGoogleMapsDirections = (route: OptimizedRoute) => {
+    const origin = encodeURIComponent(route.path[0] + ', Pakistan');
+    const destination = encodeURIComponent(route.path[route.path.length - 1] + ', Pakistan');
+
+    // Add waypoints if there are intermediate stops
+    let waypointsParam = '';
+    if (route.path.length > 2) {
+      const waypoints = route.path.slice(1, -1).map(city => encodeURIComponent(city + ', Pakistan')).join('|');
+      waypointsParam = `&waypoints=${waypoints}`;
+    }
+
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypointsParam}&travelmode=driving`;
+
+    window.open(googleMapsUrl, '_blank');
   };
 
   return (
@@ -148,58 +166,72 @@ export default function TrafficPage() {
         </Card>
 
         {/* Search Form */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Custom Route Traffic Check</CardTitle>
+        <Card className="mb-6 border-2 border-orange-200 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-blue-50">
+            <CardTitle className="flex items-center gap-2">
+              <Navigation className="w-5 h-5 text-orange-500" />
+              Find Shortest Path - Any Location
+            </CardTitle>
             <CardDescription>
-              Enter any origin and destination in Pakistan to see real-time traffic
+              🗺️ Enter ANY location in Pakistan (cities, towns, landmarks) - Our AI will calculate the shortest path and provide Google Maps directions
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">From</label>
+                <label className="text-sm font-medium flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-green-500" />
+                  Starting Point
+                </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                   <Input
-                    placeholder="e.g., Islamabad"
+                    placeholder="Any city, town, or landmark"
                     value={fromLocation}
                     onChange={(e) => setFromLocation(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 border-2 focus:border-orange-500"
                   />
                 </div>
+                <p className="text-xs text-gray-500">e.g., Islamabad, Murree, Faisal Mosque</p>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">To</label>
+                <label className="text-sm font-medium flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-red-500" />
+                  Destination
+                </label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                   <Input
-                    placeholder="e.g., Lahore"
+                    placeholder="Any city, town, or landmark"
                     value={toLocation}
                     onChange={(e) => setToLocation(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 border-2 focus:border-orange-500"
                   />
                 </div>
+                <p className="text-xs text-gray-500">e.g., Lahore, Hunza, Badshahi Mosque</p>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">&nbsp;</label>
                 <Button
                   onClick={handleCheckTraffic}
-                  className="w-full bg-orange-500 hover:bg-orange-600"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold h-12"
                   disabled={loading}
                 >
                   {loading ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Loading...
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Calculating Shortest Path...
                     </>
                   ) : (
                     <>
-                      <Navigation className="w-4 h-4 mr-2" />
-                      Check Traffic
+                      <Navigation className="w-5 h-5 mr-2" />
+                      Find Shortest Path
                     </>
                   )}
                 </Button>
+                <p className="text-xs text-center text-gray-500 mt-1">
+                  ⚡ Powered by AI Metaheuristic Algorithms
+                </p>
               </div>
             </div>
           </CardContent>
@@ -207,14 +239,16 @@ export default function TrafficPage() {
 
         {/* Optimized Routes Display */}
         {showRouteDetails && optimizedRoutes.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader>
+          <Card className="mb-6 border-2 border-green-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50">
               <CardTitle className="flex items-center gap-2">
-                <TrendingDown className="w-5 h-5 text-green-500" />
-                Optimized Routes (AI-Powered)
+                <TrendingDown className="w-6 h-6 text-green-600" />
+                🎯 Shortest Path Results - AI Optimized
               </CardTitle>
-              <CardDescription>
-                Routes calculated using advanced metaheuristic algorithms (A* & Dijkstra)
+              <CardDescription className="text-base">
+                ✨ Routes calculated using advanced metaheuristic algorithms (A* & Dijkstra)
+                <br />
+                📍 Click "Get Directions on Google Maps" to navigate with real-time traffic
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -283,6 +317,36 @@ export default function TrafficPage() {
                         ✓ This is the shortest route with minimum distance and cost
                       </div>
                     )}
+
+                    {/* Google Maps Direction Button */}
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="text-xs text-blue-800 mb-2 font-medium">
+                        🗺️ Ready to navigate? Get turn-by-turn directions:
+                      </p>
+                      <Button
+                        onClick={() => openGoogleMapsDirections(route)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold shadow-md"
+                      >
+                        <ExternalLink className="w-5 h-5 mr-2" />
+                        Open in Google Maps
+                      </Button>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Opens in new tab with real-time traffic & navigation
+                      </p>
+                    </div>
+
+                    {/* Direction Map for this route */}
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Map className="w-4 h-4 text-orange-500" />
+                        <h4 className="font-semibold text-sm">Route Preview</h4>
+                      </div>
+                      <RouteDirectionMap
+                        origin={route.path[0]}
+                        destination={route.path[route.path.length - 1]}
+                        waypoints={route.path.slice(1, -1)}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

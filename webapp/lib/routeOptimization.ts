@@ -80,7 +80,7 @@ export function dijkstraShortestPath(
   const previous = new Map<string, string | null>();
   const unvisited = new Set<string>();
 
-  // Initialize
+  
   for (const node of graph.keys()) {
     distances.set(node, Infinity);
     previous.set(node, null);

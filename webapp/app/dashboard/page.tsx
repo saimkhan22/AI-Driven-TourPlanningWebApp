@@ -11,6 +11,7 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
+import MLChatbot from '@/components/MLChatbot';
 import {
   MapPin,
   Navigation,
@@ -205,7 +206,7 @@ export default function DashboardPage() {
         </section>
 
         {/* QUICK ACTIONS */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <Card className="hover:shadow-lg transition">
             <CardHeader>
               <CardTitle>Plan a New Trip</CardTitle>
@@ -233,6 +234,25 @@ export default function DashboardPage() {
               <Link href="/destinations">
                 <Button variant="outline" className="w-full">
                   Explore Now
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-purple-600">🧠</span>
+                ML Insights
+              </CardTitle>
+              <CardDescription>
+                AI-powered recommendations & predictions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/ml-insights">
+                <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                  View Insights
                 </Button>
               </Link>
             </CardContent>
@@ -402,6 +422,9 @@ export default function DashboardPage() {
           </div>
         </section>
       </main>
+
+      {/* ML-Powered Chatbot */}
+      <MLChatbot />
     </div>
   );
 }

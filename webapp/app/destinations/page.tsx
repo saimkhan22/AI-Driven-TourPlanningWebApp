@@ -1,11 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const isLoggedIn =
   typeof window !== 'undefined' && localStorage.getItem('token');
-  
-
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -37,6 +36,31 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+interface Destination {
+  id: string | number;
+  name: string;
+  region: string;
+  type: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  price: number;
+  duration: string;
+  weather: { temp: string; condition: string };
+  highlights: string[];
+  bestFor: string[];
+  aiMatch: number;
+  itinerary: {
+    day1: string;
+    day2: string;
+    day3: string;
+  };
+  latitude?: number;
+  longitude?: number;
+  address?: string;
+  placeId?: string;
+}
+
 export default function DestinationsPage() {
   const [travelMood, setTravelMood] = useState('');
   const [budget, setBudget] = useState('');
@@ -44,8 +68,167 @@ export default function DestinationsPage() {
   const [travelers, setTravelers] = useState('');
   const [interests, setInterests] = useState('');
   const [customRequest, setCustomRequest] = useState('');
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedRegion, setSelectedRegion] = useState('all');
+  const [wishlist, setWishlist] = useState<Set<string | number>>(new Set());
 
-  const destinations = [
+  // Fetch destinations on component mount
+  useEffect(() => {
+    fetchDestinations();
+  }, [selectedRegion]);
+
+  const fetchDestinations = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('/api/destinations/search', {
+        params: {
+          query: 'tourist attractions',
+          region: selectedRegion !== 'all' ? selectedRegion : undefined,
+        },
+      });
+
+      if (response.data.success) {
+        // Map API response to match our interface
+        const mappedDestinations = response.data.destinations.map((dest: any, index: number) => ({
+          id: dest.id || index,
+          name: dest.name,
+          region: dest.location || dest.region || 'Pakistan',
+          type: getDestinationType(dest.types || []),
+          image: dest.image,
+          rating: dest.rating || 4.5,
+          reviews: dest.reviews || 0,
+          price: estimatePrice(dest.name, dest.location),
+          duration: estimateDuration(dest.name),
+          weather: { temp: '20°C', condition: 'Pleasant' },
+          highlights: extractHighlights(dest.description, dest.name),
+          bestFor: getBestFor(dest.types || []),
+          aiMatch: calculateAIMatch(dest, travelMood, interests),
+          itinerary: generateItinerary(dest.name, dest.location),
+          latitude: dest.latitude,
+          longitude: dest.longitude,
+          address: dest.address,
+          placeId: dest.placeId,
+        }));
+
+        setDestinations(mappedDestinations);
+      }
+    } catch (error) {
+      console.error('Error fetching destinations:', error);
+      // Keep fallback data if API fails
+      setDestinations(fallbackDestinations);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDestinationType = (types: string[]): string => {
+    if (types.includes('mountain') || types.includes('natural_feature')) return 'Mountain Paradise';
+    if (types.includes('museum') || types.includes('historical')) return 'Cultural Heritage';
+    if (types.includes('park')) return 'Green Paradise';
+    if (types.includes('beach')) return 'Coastal Paradise';
+    return 'Tourist Attraction';
+  };
+
+  const estimatePrice = (name: string, location: string): number => {
+    const luxuryKeywords = ['resort', 'luxury', 'premium', 'five star'];
+    const budgetKeywords = ['budget', 'hostel', 'cheap'];
+
+    const text = `${name} ${location}`.toLowerCase();
+
+    if (luxuryKeywords.some(keyword => text.includes(keyword))) {
+      return Math.floor(Math.random() * 5000) + 10000;
+    } else if (budgetKeywords.some(keyword => text.includes(keyword))) {
+      return Math.floor(Math.random() * 3000) + 3000;
+    }
+
+    return Math.floor(Math.random() * 5000) + 5000;
+  };
+
+  const estimateDuration = (name: string): string => {
+    const longTripKeywords = ['valley', 'trek', 'expedition', 'tour'];
+    const text = name.toLowerCase();
+
+    if (longTripKeywords.some(keyword => text.includes(keyword))) {
+      return `${Math.floor(Math.random() * 3) + 5} days`;
+    }
+
+    return `${Math.floor(Math.random() * 3) + 3} days`;
+  };
+
+  const extractHighlights = (description: string, name: string): string[] => {
+    const highlights = [name];
+    const keywords = ['view', 'lake', 'fort', 'mosque', 'museum', 'park', 'valley', 'mountain'];
+
+    keywords.forEach(keyword => {
+      if (description?.toLowerCase().includes(keyword)) {
+        highlights.push(keyword.charAt(0).toUpperCase() + keyword.slice(1));
+      }
+    });
+
+    return highlights.slice(0, 4);
+  };
+
+  const getBestFor = (types: string[]): string[] => {
+    const bestFor: string[] = [];
+
+    if (types.includes('natural_feature') || types.includes('park')) {
+      bestFor.push('Nature', 'Photography');
+    }
+    if (types.includes('museum') || types.includes('historical')) {
+      bestFor.push('Culture', 'History');
+    }
+    if (types.includes('tourist_attraction')) {
+      bestFor.push('Sightseeing');
+    }
+
+    return bestFor.length > 0 ? bestFor : ['Adventure', 'Exploration'];
+  };
+
+  const calculateAIMatch = (dest: any, mood: string, interests: string): number => {
+    let match = 75 + Math.floor(Math.random() * 15);
+
+    if (mood && dest.types?.some((t: string) => t.includes(mood))) {
+      match += 10;
+    }
+    if (interests && dest.types?.some((t: string) => t.includes(interests))) {
+      match += 10;
+    }
+
+    return Math.min(match, 99);
+  };
+
+  const generateItinerary = (name: string, location: string): any => {
+    return {
+      day1: `Arrival in ${location || name} and local exploration`,
+      day2: `Visit ${name} and nearby attractions`,
+      day3: `Cultural experience and local cuisine`,
+    };
+  };
+
+  const toggleWishlist = (destinationId: string | number) => {
+    setWishlist(prev => {
+      const newWishlist = new Set(prev);
+      if (newWishlist.has(destinationId)) {
+        newWishlist.delete(destinationId);
+      } else {
+        newWishlist.add(destinationId);
+      }
+      // Save to localStorage
+      localStorage.setItem('wishlist', JSON.stringify(Array.from(newWishlist)));
+      return newWishlist;
+    });
+  };
+
+  // Load wishlist from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('wishlist');
+    if (saved) {
+      setWishlist(new Set(JSON.parse(saved)));
+    }
+  }, []);
+
+  const fallbackDestinations: Destination[] = [
     {
       id: 1,
       name: 'Hunza Valley',
@@ -282,7 +465,8 @@ export default function DestinationsPage() {
       aiMatch: 75,
       itinerary: {
         day1: 'Archaeological site tour and museum',
-        day2: 'Detailed exploration and photography'
+        day2: 'Detailed exploration and photography',
+        day3: 'Local culture and departure'
       }
     }
   ];
@@ -452,7 +636,15 @@ export default function DestinationsPage() {
               </div>
             </div>
 
-            <Button className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
+            <Button
+              className="w-full md:w-auto bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700"
+              onClick={() => {
+                // Re-fetch with current preferences
+                fetchDestinations();
+                // Scroll to results
+                window.scrollTo({ top: 800, behavior: 'smooth' });
+              }}
+            >
               <Sparkles className="w-4 h-4 mr-2" />
               Get AI Recommendations
             </Button>
@@ -462,9 +654,24 @@ export default function DestinationsPage() {
         {/* Results */}
         <div className="flex justify-between items-center mb-6">
           <div className="text-lg font-medium text-gray-900">
-            AI-Curated Pakistani Destinations for You
+            {loading ? 'Loading destinations...' : `${destinations.length} AI-Curated Pakistani Destinations for You`}
           </div>
           <div className="flex items-center space-x-4">
+            <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by region" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                <SelectItem value="Gilgit-Baltistan">Gilgit-Baltistan</SelectItem>
+                <SelectItem value="KPK">Khyber Pakhtunkhwa</SelectItem>
+                <SelectItem value="Punjab">Punjab</SelectItem>
+                <SelectItem value="Sindh">Sindh</SelectItem>
+                <SelectItem value="Balochistan">Balochistan</SelectItem>
+                <SelectItem value="AJK">Azad Kashmir</SelectItem>
+                <SelectItem value="Islamabad">Islamabad</SelectItem>
+              </SelectContent>
+            </Select>
             <Select defaultValue="match">
               <SelectTrigger className="w-40">
                 <SelectValue />
@@ -481,7 +688,25 @@ export default function DestinationsPage() {
 
         {/* Destination Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {destinations.map((destination) => (
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <div className="bg-gray-300 h-48 w-full"></div>
+                <CardContent className="p-6">
+                  <div className="h-6 bg-gray-300 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded mb-4"></div>
+                  <div className="h-20 bg-gray-300 rounded"></div>
+                </CardContent>
+              </Card>
+            ))
+          ) : destinations.length === 0 ? (
+            <div className="col-span-2 text-center py-12">
+              <p className="text-gray-500 text-lg">No destinations found. Try adjusting your filters.</p>
+            </div>
+          ) : (
+            destinations.map((destination) => (
             <Card key={destination.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
               <div className="relative">
                 <img 
@@ -506,8 +731,13 @@ export default function DestinationsPage() {
                   </Badge>
                 </div>
                 <div className="absolute bottom-4 right-4">
-                  <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
-                    <Heart className="w-4 h-4" />
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className={`bg-white/90 hover:bg-white ${wishlist.has(destination.id) ? 'text-red-500' : ''}`}
+                    onClick={() => toggleWishlist(destination.id)}
+                  >
+                    <Heart className={`w-4 h-4 ${wishlist.has(destination.id) ? 'fill-current' : ''}`} />
                   </Button>
                 </div>
               </div>
@@ -572,17 +802,32 @@ export default function DestinationsPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button className="flex-1 bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Plan Trip
-                  </Button>
-                  <Button variant="outline" size="sm">
+                  <Link href={`/plan-trip?destination=${encodeURIComponent(destination.name)}&region=${encodeURIComponent(destination.region)}`} className="flex-1">
+                    <Button className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Plan Trip
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: destination.name,
+                          text: `Check out ${destination.name} in ${destination.region}!`,
+                          url: window.location.href,
+                        });
+                      }
+                    }}
+                  >
                     <Share2 className="w-4 h-4" />
                   </Button>
                 </div>
               </CardContent>
             </Card>
-          ))}
+          ))
+          )}
         </div>
 
         {/* AI Chat Assistant */}
