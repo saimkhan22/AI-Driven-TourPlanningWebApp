@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Feedback from '@/models/Feedback';
 
-// GET - Fetch all public feedback
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();

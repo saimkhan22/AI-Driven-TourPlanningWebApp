@@ -9,13 +9,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import {
   Brain,
   TrendingUp,
   Target,
-  Sparkles,
   DollarSign,
-  Calendar,
   MapPin,
   ArrowLeft,
   Loader2,
@@ -34,7 +33,6 @@ export default function MLInsightsPage() {
   const [recommendations, setRecommendations] = useState<any>(null);
   const [pricePrediction, setPricePrediction] = useState<any>(null);
   const [travelPatterns, setTravelPatterns] = useState<any>(null);
-  const [itinerary, setItinerary] = useState<any>(null);
   const [weatherRec, setWeatherRec] = useState<any>(null);
   const [crowdPrediction, setCrowdPrediction] = useState<any>(null);
   const [budgetAllocation, setBudgetAllocation] = useState<any>(null);
@@ -108,25 +106,6 @@ export default function MLInsightsPage() {
         },
       });
       setTravelPatterns(response.data);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const optimizeItinerary = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.post('/api/ml/recommendations', {
-        action: 'optimize_itinerary',
-        data: {
-          destination,
-          duration: parseInt(duration),
-          interests: interests.split(',').map((i) => i.trim()),
-        },
-      });
-      setItinerary(response.data);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -259,19 +238,11 @@ export default function MLInsightsPage() {
               <p className="text-sm opacity-90">Pattern Analysis</p>
             </CardContent>
           </Card>
-
-          <Card className="bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-            <CardContent className="pt-6">
-              <Sparkles className="w-12 h-12 mb-3 opacity-90" />
-              <h3 className="font-semibold text-lg mb-1">Neural Network</h3>
-              <p className="text-sm opacity-90">Itinerary Optimization</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* ML Features Tabs */}
         <Tabs defaultValue="recommendations" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
             <TabsTrigger value="recommendations">
               <Target className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Recommendations</span>
@@ -286,11 +257,6 @@ export default function MLInsightsPage() {
               <BarChart3 className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Patterns</span>
               <span className="sm:hidden">Pat</span>
-            </TabsTrigger>
-            <TabsTrigger value="itinerary">
-              <Calendar className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Itinerary</span>
-              <span className="sm:hidden">Itin</span>
             </TabsTrigger>
             <TabsTrigger value="weather">
               <Cloud className="w-4 h-4 mr-2" />
@@ -635,134 +601,13 @@ export default function MLInsightsPage() {
                         <ul className="space-y-2">
                           {travelPatterns.patterns.recommendations.map((rec: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2">
-                              <Sparkles className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
+                              <Star className="w-4 h-4 text-orange-500 mt-1 flex-shrink-0" />
                               <span className="text-sm">{rec}</span>
                             </li>
                           ))}
                         </ul>
                       </CardContent>
                     </Card>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Itinerary AI Tab */}
-          <TabsContent value="itinerary" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>AI-Optimized Itinerary</CardTitle>
-                <CardDescription>
-                  Using Neural Network simulation to create the perfect daily plan
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="space-y-2">
-                    <Label>Destination</Label>
-                    <Select value={destination} onValueChange={setDestination}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Hunza Valley">Hunza Valley</SelectItem>
-                        <SelectItem value="Skardu">Skardu</SelectItem>
-                        <SelectItem value="Naran Kaghan">Naran Kaghan</SelectItem>
-                        <SelectItem value="Swat Valley">Swat Valley</SelectItem>
-                        <SelectItem value="Murree">Murree</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Duration (days)</Label>
-                    <Input
-                      type="number"
-                      value={duration}
-                      onChange={(e) => setDuration(e.target.value)}
-                      min="1"
-                      max="14"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Interests</Label>
-                    <Input
-                      value={interests}
-                      onChange={(e) => setInterests(e.target.value)}
-                      placeholder="hiking, culture, photography"
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={optimizeItinerary}
-                  disabled={loading}
-                  className="w-full bg-orange-600 hover:bg-orange-700"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Optimizing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generate AI Itinerary
-                    </>
-                  )}
-                </Button>
-
-                {itinerary && (
-                  <div className="mt-6 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-lg">Optimized Daily Plan</h3>
-                      <Badge variant="outline">{itinerary.algorithm}</Badge>
-                    </div>
-
-                    <Card className="bg-orange-50 border-orange-200">
-                      <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm text-gray-600">Optimization Score</p>
-                            <p className="text-3xl font-bold text-orange-600">
-                              {itinerary.itinerary.totalScore}
-                            </p>
-                          </div>
-                          <Star className="w-16 h-16 text-orange-400 fill-orange-400" />
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <div className="space-y-3">
-                      {itinerary.itinerary.dailyPlan.map((day: any) => (
-                        <Card key={day.day} className="hover:shadow-md transition-shadow">
-                          <CardContent className="pt-6">
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                                  <span className="font-bold text-orange-600">D{day.day}</span>
-                                </div>
-                                <div>
-                                  <h4 className="font-semibold">Day {day.day}</h4>
-                                  <p className="text-sm text-gray-600">
-                                    Est. Cost: PKR {day.estimatedCost.toLocaleString()}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {day.activities.map((activity: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="capitalize">
-                                  {activity}
-                                </Badge>
-                              ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
                   </div>
                 )}
               </CardContent>
